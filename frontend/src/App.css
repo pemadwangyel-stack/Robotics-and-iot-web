@@ -1,0 +1,116 @@
+/* ==========================================================================
+   GLOBAL VIEWPORT RESET
+   ========================================================================== */
+html, 
+body, 
+#root, 
+.app-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   APP CONTAINER
+   ========================================================================== */
+.app-container {
+  width: 100%;
+}
+
+/* ==========================================================================
+   DASHBOARD OVERRIDES
+   ========================================================================== */
+.dashboard-container {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* ==========================================================================
+   FLOATING ACTIONS
+   ========================================================================== */
+.floating-actions-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  margin-top: -30px;
+  margin-bottom: -30px;
+  position: relative;
+  z-index: 5;
+}
+
+.floating-actions-container .action-btn {
+  padding: 1rem 2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: sans-serif;
+  flex: 1;
+  max-width: 280px;
+  text-align: center;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  border: 2px solid;
+}
+
+.floating-actions-container .action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(0, 210, 255, 0.6);
+}
+
+.floating-actions-container .explore-btn {
+  background-color: #00d2ff;
+  color: #0f172a;
+  border-color: #00d2ff;
+  box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+}
+
+.floating-actions-container .explore-btn:hover {
+  background-color: #00bce3;
+  border-color: #00bce3;
+}
+
+.floating-actions-container .admission-btn {
+  background-color: #111827;
+  color: #00d2ff;
+  border-color: #00d2ff;
+  box-shadow: 0 4px 15px rgba(0, 210, 255, 0.15);
+}
+
+.floating-actions-container .admission-btn:hover {
+  background-color: #1f2937;
+}
+
+.floating-actions-container .facilities-btn {
+  background-color: #111827;
+  color: #00d2ff;
+  border-color: #00d2ff;
+  box-shadow: 0 4px 15px rgba(0, 210, 255, 0.15);
+}
+
+.floating-actions-container .facilities-btn:hover {
+  background-color: #1f2937;
+}
+
+@media (max-width: 992px) {
+  .floating-actions-container {
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: -85px;
+    margin-bottom: -85px;
+  }
+
+  .floating-actions-container .action-btn {
+    width: 80%;
+    max-width: 320px;
+    padding: 0.8rem 2rem;
+    font-size: 1.05rem;
+  }
+}

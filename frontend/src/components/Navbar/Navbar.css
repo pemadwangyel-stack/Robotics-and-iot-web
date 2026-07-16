@@ -1,0 +1,163 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.2rem 5% 0.2rem 2%;
+  background-color: #111827;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.logo-img-css {
+  height: 90px;
+  width: 90px;
+  background-image: url('/logo.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.logo-sub {
+  color: #00d2ff;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.navbar-links {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+  align-items: center;
+}
+
+.navbar-links a {
+  color: #9ca3af;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar-links a:hover,
+.navbar-links a.active {
+  color: #00d2ff;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-portal {
+  background: transparent;
+  color: #00d2ff;
+  border: 2px solid #00d2ff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-portal:hover {
+  background: #00d2ff;
+  color: #111827;
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+}
+
+.navbar-flag-holder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #374151;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.navbar-flag-img {
+  height: 32px;
+  width: 45px;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+    padding: 0.5rem 1rem;
+  }
+  
+  .navbar-logo {
+    font-size: 1rem;
+  }
+  
+  .logo-img-css {
+    height: 60px;
+    width: 60px;
+  }
+  
+  .navbar-links {
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .navbar-actions {
+    gap: 0.5rem;
+  }
+  
+  .btn-portal {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .navbar-logo {
+    justify-content: center;
+  }
+  
+  .navbar-links {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .navbar-actions {
+    justify-content: center;
+  }
+  
+  .logo-img-css {
+    height: 50px;
+    width: 50px;
+  }
+  
+  .logo-text {
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,120 @@
+.about-section {
+  background-color: #ffffff; /* Clean white background */
+  padding: 5rem 5%; /* Increased padding slightly for overall breathing room */
+  color: #111827; /* Dark text for readability */
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.about-main-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  letter-spacing: 1px;
+  color: #111827;
+}
+
+.about-container {
+  max-width: 1400px; /* Expanded max-width so the 50/50 blocks can grow larger */
+  margin: 0 auto;
+  display: flex;
+  align-items: center; /* Vertical balance alignment */
+  gap: 3rem; /* Increased space between video box and text box */
+  flex-wrap: wrap; /* Keeps it responsive on smaller screens */
+}
+
+/* Video Side Layout - 50% WIDTH */
+.about-video-side {
+  flex: 1; /* Equal 50/50 balance weight */
+  min-width: 350px; /* Slightly higher minimum layout width */
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 72%; /* INCREASED HEIGHT: Changes aspect ratio to make the rectangle much taller */
+  height: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #00d2ff; /* Electric blue layout border */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Slightly deeper shadow for the larger element */
+}
+
+.about-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures video fills the frame without black bars */
+}
+
+/* Content Text Side Layout - 50% WIDTH */
+.about-text-side {
+  flex: 1; /* Equal 50/50 balance weight */
+  min-width: 350px;
+  border: 2px solid #00d2ff; /* Electric blue card border */
+  border-radius: 8px;
+  padding: 3rem 2.5rem; /* Increased padding to match the expanded video height */
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.about-text-side h3 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  color: #111827;
+}
+
+.about-intro-text {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #374151; /* Balanced dark gray for presentation */
+  margin-bottom: 2rem;
+}
+
+/* Internal two-column grid for Vision & Mission boxes */
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.details-column h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  color: #111827;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Quote styles for Mission & Vision statements */
+.quote-text {
+  font-size: 0.95rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.6;
+  color: #1f2937;
+  border-left: 3px solid #00d2ff; /* Clean electric blue indicator block */
+  padding-left: 0.75rem;
+  margin: 0;
+}
+
+/* Responsive breakpoint for stacked layout on tablet/mobile */
+@media (max-width: 1024px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .about-container {
+    flex-direction: column;
+  }
+  .video-wrapper {
+    padding-bottom: 56.25%; /* Returns to regular widescreen landscape ratio on mobile screens */
+  }
+}

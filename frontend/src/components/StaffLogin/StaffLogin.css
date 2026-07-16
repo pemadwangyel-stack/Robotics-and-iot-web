@@ -1,0 +1,184 @@
+.login-page {
+  background-color: #ffffff;
+  color: #111827;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  font-family: sans-serif;
+  position: relative;
+}
+
+/* Subtly added a very soft engineering tech grid pattern to the white background */
+.login-page::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: radial-gradient(#0070f3 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.login-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border: 2px solid #111827;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 10px 30px rgba(0, 112, 243, 0.05);
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Enhances card border to a sleek tech-blue when interacting */
+.login-card:hover {
+  border-color: #0070f3;
+  box-shadow: 0 10px 35px rgba(0, 112, 243, 0.1);
+}
+
+/* BRAND LAYOUT */
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-logo {
+  height: 70px;
+  width: 70px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #111827;
+  margin-bottom: 0.75rem;
+  transition: border-color 0.3s ease;
+}
+
+.login-card:hover .login-logo {
+  border-color: #0070f3;
+}
+
+.login-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  color: #111827;
+}
+
+.login-subtitle {
+  font-size: 0.85rem;
+  color: #0070f3; /* Accent blue for hierarchy */
+  font-weight: 700;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* SYSTEM ERROR MESSAGES */
+.login-error-toast {
+  background-color: #ef4444;
+  color: #ffffff;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+/* INPUT COMPONENT BLOCKS */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #4b5563;
+  letter-spacing: 0.3px;
+}
+
+.input-group input {
+  background-color: #ffffff;
+  color: #111827;
+  border: 2px solid #111827;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+/* Blue emphasis on focused inputs */
+.input-group input:focus {
+  border-color: #0070f3;
+  background-color: #fafcff;
+  box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+}
+
+/* ACTION CONTROLLER TRIGGER BUTTONS */
+.btn-login-submit {
+  background-color: #111827;
+  color: #ffffff;
+  border: 2px solid #111827;
+  padding: 0.9rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+/* High contrast tech hover states */
+.btn-login-submit:hover {
+  background-color: #0070f3;
+  border-color: #0070f3;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.2);
+}
+
+.btn-login-cancel {
+  background: transparent;
+  color: #4b5563;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: color 0.2s;
+}
+
+.btn-login-cancel:hover {
+  color: #0070f3;
+  text-decoration: underline;
+}
+
+.login-footer-notice {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 2rem;
+  border-top: 1px dashed #e5e7eb;
+  padding-top: 1rem;
+}
