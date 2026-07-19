@@ -11,13 +11,15 @@ function Admission({ onBack }) {
     citizenshipStatus: 'Bhutanese',
     cidNumber: '',
     passportNumber: '',
+    schoolName: '',
+    className: '',
     mobileNumber: '',
     isWhatsAppSame: true,
     whatsAppNumber: '',
     emailAddress: '',
     guardianName: '',
     relationship: '',
-    courseTrack: 'Basic Robotics (Youth Track)',
+    courseTrack: 'Robotics and IOT', 
     safetyConsent: false
   });
 
@@ -41,8 +43,8 @@ function Admission({ onBack }) {
       ...formData,
       name: formData.fullName,
       course: formData.courseTrack,
-      totalFee: 7000, // Normalized default total amount expected by dashboard logic
-      paidFee: 5000,  // Normalized default baseline deposit amount expected by dashboard logic
+      totalFee: 7000, 
+      paidFee: 5000,  
       status: 'Paid'
     };
 
@@ -72,13 +74,15 @@ function Admission({ onBack }) {
           citizenshipStatus: 'Bhutanese',
           cidNumber: '',
           passportNumber: '',
+          schoolName: '',
+          className: '',
           mobileNumber: '',
           isWhatsAppSame: true,
           whatsAppNumber: '',
           emailAddress: '',
           guardianName: '',
           relationship: '',
-          courseTrack: 'Basic Robotics (Youth Track)',
+          courseTrack: 'Robotics and IOT', 
           safetyConsent: false
         });
       } else {
@@ -145,15 +149,25 @@ function Admission({ onBack }) {
                 </select>
               </div>
 
+              <div className="form-field">
+                <label>Name of the School *</label>
+                <input type="text" name="schoolName" required value={formData.schoolName} onChange={handleInputChange} placeholder="Enter your school name" />
+              </div>
+
+              <div className="form-field">
+                <label>Class *</label>
+                <input type="text" name="className" required value={formData.className} onChange={handleInputChange} placeholder="e.g., Class 10, B.Sc, etc." />
+              </div>
+
               {/* DYNAMIC REGIONAL ENGINE CONDITIONAL BLOCKS */}
-              <div className="conditional-field-wrapper">
+              <div className="conditional-field-wrapper" style={{ gridColumn: '1 / -1' }}>
                 {formData.citizenshipStatus === 'Bhutanese' ? (
-                  <div className="form-field" style={{ gridColumn: '1 / -1' }}>
-                    <label>CID Number *</label>
-                    <input type="text" name="cidNumber" required value={formData.cidNumber} onChange={handleInputChange} placeholder="Enter 11-digit Citizenship ID Number" maxLength="11" />
+                  <div className="form-field">
+                    <label>CID Number (Optional)</label>
+                    <input type="text" name="cidNumber" value={formData.cidNumber} onChange={handleInputChange} placeholder="Enter 11-digit Citizenship ID Number" maxLength="11" />
                   </div>
                 ) : (
-                  <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                  <div className="form-field">
                     <label>Passport Number / Visa Status *</label>
                     <input type="text" name="passportNumber" required value={formData.passportNumber} onChange={handleInputChange} placeholder="Enter Passport or Work Permit ID" />
                   </div>
@@ -213,9 +227,14 @@ function Admission({ onBack }) {
               <div className="form-field" style={{ gridColumn: '1 / -1' }}>
                 <label>Select Preferred Tech Track *</label>
                 <select name="courseTrack" value={formData.courseTrack} onChange={handleInputChange}>
-                  <option value="Basic Robotics (Youth Track)">Basic Robotics (Youth Track)</option>
-                  <option value="Drone Telemetry Prototyping (Intermediate Track)">Drone Telemetry Prototyping (Intermediate Track)</option>
-                  <option value="IoT Smart Farm Systems (Adult Track)">IoT Smart Farm Systems (Adult Track)</option>
+                  <option value="Robotics and IOT">Robotics and IOT</option>
+                  <option value="3-d Designing">3-d Designing</option>
+                  <option value="Drone Technology">Drone Technology</option>
+                  <option value="ICT foundation">ICT foundation</option>
+                  <option value="Artificial intelligence">Artificial intelligence</option>
+                  <option value="Python programming">Python programming</option>
+                  <option value="Winter Robotics camp">Winter Robotics camp</option>
+                  <option value="Summer Robotics camp">Summer Robotics camp</option>
                 </select>
               </div>
 

@@ -5,8 +5,10 @@ const StudentSchema = new mongoose.Schema({
     dob: { type: Date, required: true },
     gender: { type: String, required: true },
     citizenshipStatus: { type: String, required: true, default: 'Bhutanese' },
-    cidNumber: { type: String },
+    cidNumber: { type: String }, // Optional by default
     passportNumber: { type: String },
+    schoolName: { type: String, required: true }, // Added field matching frontend
+    className: { type: String, required: true },  // Added field matching frontend
     mobileNumber: { type: String, required: true },
     isWhatsAppSame: { type: Boolean, default: true },
     whatsAppNumber: { type: String },
@@ -24,7 +26,7 @@ const StudentSchema = new mongoose.Schema({
     attendanceCount: { type: Number, default: 0 },
     
     // --- STATUS FIELDS ---
-    status: { type: String, enum: ['Active', 'Pending', 'Completed'], default: 'Active' },
+    status: { type: String, enum: ['Active', 'Pending', 'Completed'], default: 'Pending' }, // Default changed to 'Pending' for new admissions
     amountPaid: { type: Number, default: 0 },
 
     // --- EXTRA FIELDS (for frontend compatibility) ---

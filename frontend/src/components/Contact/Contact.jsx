@@ -93,7 +93,7 @@ function Contact() {
           <div style={{ display: 'flex', gap: '1rem' }}>
             {/* Direct Facebook Link */}
             <a 
-              href="https://www.facebook.com/profile.php?id=100093116631899" // Your official page link parsed from the site domain configuration!
+              href="https://www.facebook.com/profile.php?id=61561087015537" // Your official page link parsed from the site domain configuration!
               target="_blank" 
               rel="noreferrer"
               style={{

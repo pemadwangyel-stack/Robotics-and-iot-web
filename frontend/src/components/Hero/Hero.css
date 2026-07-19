@@ -52,41 +52,224 @@
   margin-bottom: 0rem; /* Reduced to match the layout cleanly */
 }
 
-/* Graphic Section */
+/* Graphic/Right Section Wrapper */
 .hero-image-container {
   flex: 1;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end; /* Pushes the glass container nicely to the right */
   align-items: center;
 }
 
-.hero-graphic {
-  position: relative;
-  width: 250px;
-  height: 250px;
-  background: rgba(0, 210, 255, 0.1);
-  border: 2px dashed #00d2ff;
-  border-radius: 50%;
+/* --- GLASSMORPHIC ANNOUNCEMENTS CONTAINER --- */
+.news-glass-container {
+  width: 420px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  z-index: 10;
+}
+
+.news-title {
+  color: #fff;
+  font-size: 1.3rem;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+.news-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Individual Glass Cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  text-align: left; /* Ensures left alignment */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.category-tag {
+  font-size: 0.72rem;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* Category Badge Colors */
+.category-tag.event { background: rgba(0, 210, 255, 0.15); color: #00d2ff; border: 1px solid rgba(0, 210, 255, 0.3); }
+.category-tag.notice { background: rgba(241, 196, 15, 0.15); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.3); }
+.category-tag.update { background: rgba(46, 204, 113, 0.15); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); }
+
+.card-date {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.glass-card h4 {
+  color: #fff;
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+}
+
+.glass-card p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.88rem;
+  margin: 0 !important; /* Forces reset */
+  line-height: 1.4;
+}
+
+/* ================= POP-UP MODAL STYLES ================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.75); /* Soft slate overlay matching your site theme */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 9999; /* Always keep on top */
 }
 
-.graphic-icon {
-  font-size: 6rem;
+.modal-content {
+  background: rgba(15, 23, 42, 0.95); /* Deep dark background matching App.css */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  width: 90%;
+  max-width: 500px;
+  padding: 32px;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  text-align: left;
 }
 
-.pulse-circle {
+.close-modal-btn {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 2px solid #00d2ff;
-  animation: pulse 2s infinite ease-out;
-  opacity: 0;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 2.2rem;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  line-height: 1;
 }
 
-@keyframes pulse {
-  0% { transform: scale(0.9); opacity: 0.5; }
-  100% { transform: scale(1.3); opacity: 0; }
+.close-modal-btn:hover {
+  color: #ff4a4a;
+  transform: scale(1.1);
+}
+
+.modal-header-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-tag {
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.modal-tag.event { background: rgba(0, 210, 255, 0.2); color: #00d2ff; }
+.modal-tag.notice { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+.modal-tag.update { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+
+.modal-date-tag {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.modal-title {
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 15px 0;
+  line-height: 1.3;
+}
+
+.modal-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.02) 100%);
+  margin-bottom: 20px;
+}
+
+.modal-description {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- THE COOL SPRINGY SCALE-UP ANIMATION --- */
+@keyframes scaleUp {
+  from {
+    transform: scale(0.82);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Responsiveness adjustments for smaller screens */
+@media (max-width: 968px) {
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 3rem 5%;
+    gap: 40px;
+  }
+  .hero-content {
+    max-width: 100%;
+  }
+  .hero-image-container {
+    width: 100%;
+    justify-content: center;
+  }
+  .news-glass-container {
+    width: 100%;
+    max-width: 450px;
+  }
 }
