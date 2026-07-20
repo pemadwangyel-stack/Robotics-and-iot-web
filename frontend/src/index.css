@@ -24,10 +24,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -50,22 +46,32 @@
   }
 }
 
+/* ===== BODY RESET ===== */
 body {
   margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
 }
 
+/* ===== ROOT CONTAINER ===== */
 #root {
-  width: 1126px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 1126px;
   margin: 0 auto;
   text-align: center;
   border-inline: 1px solid var(--border);
+  min-height: 100vh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  padding: 0 1rem;
 }
 
+/* ===== HEADINGS ===== */
 h1,
 h2 {
   font-family: var(--heading);
@@ -77,24 +83,30 @@ h1 {
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+  word-wrap: break-word;
+  line-height: 1.1;
 }
+
 h2 {
   font-size: 24px;
   line-height: 118%;
   letter-spacing: -0.24px;
   margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+  word-wrap: break-word;
 }
 
+h3, h4, h5, h6 {
+  word-wrap: break-word;
+}
+
+/* ===== PARAGRAPHS ===== */
+p {
+  margin: 0;
+  word-wrap: break-word;
+  line-height: 1.6;
+}
+
+/* ===== CODE ELEMENTS ===== */
 code,
 .counter {
   font-family: var(--mono);
@@ -108,4 +120,513 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+/* ===== IMAGES ===== */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== LINKS ===== */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== LISTS ===== */
+ul, ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+/* ===== TABLES ===== */
+table {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===== FORMS ===== */
+input, textarea, select, button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text);
+}
+
+/* ==========================================================================
+   📱 RESPONSIVE - MOBILE FIXES
+   ========================================================================== */
+
+/* Tablet & Small Laptops */
+@media (max-width: 1024px) {
+  :root {
+    font-size: 16px;
+  }
+
+  #root {
+    padding: 0 0.75rem;
+    border-inline: none;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin: 20px 0;
+    letter-spacing: -1px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  code {
+    font-size: 13px;
+    padding: 3px 6px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  :root {
+    font-size: 15px;
+  }
+
+  #root {
+    padding: 0 0.5rem;
+    border-inline: none;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 30px;
+    margin: 16px 0;
+    letter-spacing: -0.8px;
+  }
+
+  h2 {
+    font-size: 18px;
+    letter-spacing: -0.2px;
+    margin: 0 0 6px;
+  }
+
+  code {
+    font-size: 12px;
+    padding: 2px 5px;
+  }
+
+  ul, ol {
+    padding-left: 1.25rem;
+  }
+}
+
+/* Phone */
+@media (max-width: 480px) {
+  :root {
+    font-size: 14px;
+    letter-spacing: 0.1px;
+  }
+
+  #root {
+    padding: 0 0.25rem;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin: 12px 0;
+    letter-spacing: -0.5px;
+  }
+
+  h2 {
+    font-size: 16px;
+    letter-spacing: -0.15px;
+    margin: 0 0 4px;
+  }
+
+  code {
+    font-size: 11px;
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+
+  ul, ol {
+    padding-left: 1rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+/* Very small phones (under 360px) */
+@media (max-width: 360px) {
+  :root {
+    font-size: 13px;
+  }
+
+  #root {
+    padding: 0 0.15rem;
+  }
+
+  h1 {
+    font-size: 20px;
+    margin: 10px 0;
+    letter-spacing: -0.3px;
+  }
+
+  h2 {
+    font-size: 14px;
+    letter-spacing: -0.1px;
+  }
+
+  code {
+    font-size: 10px;
+    padding: 1px 3px;
+  }
+
+  p {
+    font-size: 0.85rem;
+  }
+}
+
+/* Landscape Phone Mode */
+@media (max-height: 600px) and (orientation: landscape) {
+  #root {
+    padding: 0 0.5rem;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin: 12px 0;
+    letter-spacing: -0.5px;
+  }
+
+  h2 {
+    font-size: 16px;
+    margin: 0 0 4px;
+  }
+
+  code {
+    font-size: 12px;
+    padding: 2px 5px;
+  }
+}
+
+/* ==========================================================================
+   DARK MODE ENHANCEMENTS
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text);
+  }
+
+  /* Improve dark mode readability */
+  code {
+    background: var(--code-bg);
+    color: var(--text-h);
+  }
+
+  /* Dark mode link hover */
+  a:hover {
+    color: var(--accent);
+    opacity: 0.8;
+  }
+}
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+/* Text alignment */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* Flex utilities */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+/* Gap utilities */
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-5 { gap: 1.25rem; }
+.gap-6 { gap: 1.5rem; }
+
+/* Padding utilities */
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 0.75rem; }
+.p-4 { padding: 1rem; }
+.p-5 { padding: 1.25rem; }
+.p-6 { padding: 1.5rem; }
+
+/* Margin utilities */
+.m-1 { margin: 0.25rem; }
+.m-2 { margin: 0.5rem; }
+.m-3 { margin: 0.75rem; }
+.m-4 { margin: 1rem; }
+.m-5 { margin: 1.25rem; }
+.m-6 { margin: 1.5rem; }
+.m-auto { margin: auto; }
+
+/* Width utilities */
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.w-screen { width: 100vw; }
+
+/* Max width utilities */
+.max-w-full { max-width: 100%; }
+.max-w-screen { max-width: 100vw; }
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Hide on desktop */
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* Show on mobile */
+@media (max-width: 768px) {
+  .show-mobile {
+    display: block !important;
+  }
+}
+
+/* Show on desktop */
+@media (min-width: 769px) {
+  .show-desktop {
+    display: block !important;
+  }
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Animation classes */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease both;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease both;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.4s ease both;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   PRINT STYLES
+   ========================================================================== */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  #root {
+    max-width: 100%;
+    border: none;
+    padding: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: black !important;
+  }
+
+  code {
+    background: #f5f5f5 !important;
+    color: black !important;
+  }
+
+  a {
+    color: black !important;
+    text-decoration: underline !important;
+  }
+
+  .print-break {
+    page-break-after: always;
+  }
+}
+
+/* ==========================================================================
+   ACCESSIBILITY
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Skip to content link */
+.skip-to-content {
+  position: absolute;
+  top: -9999px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  color: var(--text-h);
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  z-index: 9999;
+}
+
+.skip-to-content:focus {
+  top: 0.5rem;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --text: #000000;
+    --text-h: #000000;
+    --bg: #ffffff;
+    --border: #000000;
+    --code-bg: #f0f0f0;
+    --accent: #0055cc;
+    --accent-bg: #e6f0ff;
+    --accent-border: #0055cc;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text: #ffffff;
+      --text-h: #ffffff;
+      --bg: #000000;
+      --border: #ffffff;
+      --code-bg: #1a1a1a;
+      --accent: #66aaff;
+      --accent-bg: #001a33;
+      --accent-border: #66aaff;
+    }
+  }
 }

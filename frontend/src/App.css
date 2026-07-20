@@ -24,6 +24,7 @@ body,
   width: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 /* ==========================================================================
@@ -50,6 +51,7 @@ body,
   position: relative;
   z-index: 5;
   padding: 0 20px;
+  flex-wrap: wrap;
 }
 
 .floating-actions-container .action-btn {
@@ -111,6 +113,24 @@ body,
 /* ==========================================================================
    📱 RESPONSIVE TABLET & MOBILE VIEW FIX
    ========================================================================== */
+
+/* Tablet & Small Laptops */
+@media (max-width: 1024px) {
+  .floating-actions-container {
+    gap: 1.2rem;
+    margin-top: -20px;
+    margin-bottom: -20px;
+    padding: 0 15px;
+  }
+
+  .floating-actions-container .action-btn {
+    padding: 0.9rem 1.8rem;
+    font-size: 1.05rem;
+    max-width: 240px;
+  }
+}
+
+/* Tablet */
 @media (max-width: 992px) {
   .floating-actions-container {
     flex-direction: column;
@@ -126,5 +146,82 @@ body,
     padding: 0.9rem 1.5rem;
     font-size: 1.05rem;
     white-space: normal; /* Enables elegant text breaks if screen is very narrow */
+  }
+}
+
+/* Small Tablet & Large Phone */
+@media (max-width: 768px) {
+  .floating-actions-container {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    gap: 0.8rem;
+    padding: 0 12px;
+  }
+
+  .floating-actions-container .action-btn {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.95rem;
+    max-width: 300px;
+    border-radius: 10px;
+    border-width: 1.5px;
+  }
+}
+
+/* Phone */
+@media (max-width: 480px) {
+  .floating-actions-container {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    gap: 0.6rem;
+    padding: 0 10px;
+  }
+
+  .floating-actions-container .action-btn {
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    max-width: 280px;
+    border-radius: 8px;
+    border-width: 1.5px;
+    letter-spacing: 0.3px;
+  }
+}
+
+/* Very Small Phones (under 360px) */
+@media (max-width: 360px) {
+  .floating-actions-container {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    gap: 0.5rem;
+    padding: 0 8px;
+  }
+
+  .floating-actions-container .action-btn {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.75rem;
+    max-width: 240px;
+    border-radius: 6px;
+    border-width: 1px;
+  }
+}
+
+/* Landscape Phone Mode */
+@media (max-height: 600px) and (orientation: landscape) {
+  .floating-actions-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+  }
+
+  .floating-actions-container .action-btn {
+    flex: 1;
+    min-width: 120px;
+    max-width: 200px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    border-radius: 8px;
   }
 }
