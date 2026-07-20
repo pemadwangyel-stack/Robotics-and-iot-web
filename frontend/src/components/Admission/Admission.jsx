@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './Admission.css';
-import { buildApiUrl } from '../../utils/api';
 
 function Admission({ onBack }) {
   // Input fields tracking state
@@ -23,8 +22,13 @@ function Admission({ onBack }) {
     safetyConsent: false
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    // For checkbox inputs, use 'checked' value, for others use 'value'
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -33,64 +37,119 @@ function Admission({ onBack }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.safetyConsent) {
+    
+    // Debug: Check if safetyConsent is being captured
+    console.log('Safety Consent Value:', formData.safetyConsent);
+    
+    // Check safety consent - FIXED!
+    if (formData.safetyConsent !== true) {
       alert('Please check the Laboratory Safety Consent to proceed.');
       return;
     }
 
-    // Standardized payload to match both backend model attributes and aggregation logic
-    const standardizedPayload = {
-      ...formData,
-      name: formData.fullName,
-      course: formData.courseTrack,
-      totalFee: 7000, 
-      paidFee: 5000,  
-      status: 'Paid'
-    };
+    setIsSubmitting(true);
+    setSubmitMessage('');
 
     try {
-      const response = await fetch(buildApiUrl('/api/admission/register'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(standardizedPayload),
+      // Prepare data for storage
+      const admissionData = {
+        id: 'admission-' + Date.now(),
+        _id: 'admission-' + Date.now(),
+        fullName: formData.fullName,
+        name: formData.fullName,
+        dob: formData.dob,
+        gender: formData.gender,
+        citizenshipStatus: formData.citizenshipStatus,
+        cidNumber: formData.cidNumber || '',
+        passportNumber: formData.passportNumber || '',
+        school: formData.schoolName,
+        schoolName: formData.schoolName,
+        className: formData.className,
+        class: formData.className,
+        courseTrack: formData.courseTrack,
+        mobileNumber: formData.mobileNumber,
+        phone: formData.mobileNumber,
+        whatsAppNumber: formData.isWhatsAppSame ? formData.mobileNumber : formData.whatsAppNumber,
+        emailAddress: formData.emailAddress,
+        email: formData.emailAddress,
+        guardianName: formData.guardianName,
+        guardian: formData.guardianName,
+        relationship: formData.relationship,
+        status: 'Pending',
+        submittedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        totalFee: 7500,
+        paidFee: 0,
+        safetyConsent: formData.safetyConsent,
+        enrollYear: new Date().getFullYear().toString()
+      };
+
+      console.log('Submitting Admission Data:', admissionData);
+
+      // Get existing admissions from localStorage
+      const existingAdmissions = JSON.parse(localStorage.getItem('dashboard_admissions') || '[]');
+      
+      // Add new admission
+      const updatedAdmissions = [admissionData, ...existingAdmissions];
+      
+      // Save to localStorage
+      localStorage.setItem('dashboard_admissions', JSON.stringify(updatedAdmissions));
+
+      // Also update students list
+      const existingStudents = JSON.parse(localStorage.getItem('dashboard_students') || '[]');
+      const studentData = {
+        _id: 'student-' + Date.now(),
+        name: formData.fullName,
+        fullName: formData.fullName,
+        class: formData.className,
+        courseTrack: formData.courseTrack,
+        school: formData.schoolName,
+        guardian: formData.guardianName,
+        guardianName: formData.guardianName,
+        phone: formData.mobileNumber,
+        mobileNumber: formData.mobileNumber,
+        email: formData.emailAddress,
+        emailAddress: formData.emailAddress,
+        status: 'Active',
+        paymentStatus: 'Pending',
+        enrollYear: new Date().getFullYear().toString(),
+        source: 'Public Admission',
+        totalFees: 7500,
+        amountPaid: 0
+      };
+      localStorage.setItem('dashboard_students', JSON.stringify([studentData, ...existingStudents]));
+
+      // Show success message
+      setSubmitMessage('✅ Application submitted successfully! The admin will review your details.');
+      
+      // Clear the form
+      setFormData({
+        fullName: '',
+        dob: '',
+        gender: '',
+        citizenshipStatus: 'Bhutanese',
+        cidNumber: '',
+        passportNumber: '',
+        schoolName: '',
+        className: '',
+        mobileNumber: '',
+        isWhatsAppSame: true,
+        whatsAppNumber: '',
+        emailAddress: '',
+        guardianName: '',
+        relationship: '',
+        courseTrack: 'Robotics and IOT', 
+        safetyConsent: false
       });
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
+      alert('🎉 Application submitted successfully! The admin will review your details.');
 
-      const data = await response.json();
-
-      if (data.success) {
-        alert('🎉 Application submitted successfully! The admin will review your details.');
-        
-        // Clear the form fields after successful submission
-        setFormData({
-          fullName: '',
-          dob: '',
-          gender: '',
-          citizenshipStatus: 'Bhutanese',
-          cidNumber: '',
-          passportNumber: '',
-          schoolName: '',
-          className: '',
-          mobileNumber: '',
-          isWhatsAppSame: true,
-          whatsAppNumber: '',
-          emailAddress: '',
-          guardianName: '',
-          relationship: '',
-          courseTrack: 'Robotics and IOT', 
-          safetyConsent: false
-        });
-      } else {
-        alert('❌ Submission failed: ' + data.message);
-      }
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('❌ Something went wrong. Make sure your backend server is running on http://localhost:5000!');
+      setSubmitMessage('❌ Submission failed. Please try again.');
+      alert('❌ Submission failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -98,7 +157,7 @@ function Admission({ onBack }) {
     <div className="admission-page">
       <div className="admission-container">
         
-        {/* STANDALONE MINIMAL HEADER AREA */}
+        {/* HEADER */}
         <header className="admission-header">
           <div className="admission-brand">
             <img src="/logo2.jpg" alt="RITI Emblem" className="admission-logo-img" />
@@ -113,6 +172,20 @@ function Admission({ onBack }) {
         </header>
 
         <h1 className="admission-main-title">Admission Form: Student Enrollment</h1>
+
+        {submitMessage && (
+          <div style={{
+            padding: '1rem',
+            backgroundColor: submitMessage.includes('✅') ? '#dcfce7' : '#fee2e2',
+            color: submitMessage.includes('✅') ? '#16a34a' : '#dc2626',
+            borderRadius: '8px',
+            marginBottom: '1.5rem',
+            textAlign: 'center',
+            fontWeight: '600'
+          }}>
+            {submitMessage}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           
@@ -159,7 +232,7 @@ function Admission({ onBack }) {
                 <input type="text" name="className" required value={formData.className} onChange={handleInputChange} placeholder="e.g., Class 10, B.Sc, etc." />
               </div>
 
-              {/* DYNAMIC REGIONAL ENGINE CONDITIONAL BLOCKS */}
+              {/* Conditional Field */}
               <div className="conditional-field-wrapper" style={{ gridColumn: '1 / -1' }}>
                 {formData.citizenshipStatus === 'Bhutanese' ? (
                   <div className="form-field">
@@ -186,14 +259,12 @@ function Admission({ onBack }) {
                 <label>Mobile Number *</label>
                 <input type="tel" name="mobileNumber" required value={formData.mobileNumber} onChange={handleInputChange} placeholder="Enter primary contact number" />
                 
-                {/* WHATSAPP LOGISTIC CHECKBOX */}
                 <div className="checkbox-field">
                   <input type="checkbox" id="isWhatsAppSame" name="isWhatsAppSame" checked={formData.isWhatsAppSame} onChange={handleInputChange} />
                   <label htmlFor="isWhatsAppSame">This number is active on WhatsApp</label>
                 </div>
               </div>
 
-              {/* DYNAMIC WHATSAPP INPUT IF SUB-NUMBER EXISTS */}
               {!formData.isWhatsAppSame && (
                 <div className="form-field">
                   <label>WhatsApp Number *</label>
@@ -244,14 +315,21 @@ function Admission({ onBack }) {
           {/* DECLARATION & SAFETY CONSENT */}
           <div className="submit-container">
             <div className="checkbox-field" style={{ marginBottom: '1.5rem' }}>
-              <input type="checkbox" id="safetyConsent" name="safetyConsent" checked={formData.safetyConsent} onChange={handleInputChange} />
+              <input 
+                type="checkbox" 
+                id="safetyConsent" 
+                name="safetyConsent" 
+                checked={formData.safetyConsent} 
+                onChange={handleInputChange} 
+                required
+              />
               <label htmlFor="safetyConsent">
                 <strong>Laboratory Safety Consent:</strong> I acknowledge that RITI Bhutan engineering hubs involve handling components and prototyping equipment safely, and I agree to strictly adhere to the designated safety protocols.
               </label>
             </div>
 
-            <button type="submit" className="btn-submit-admission">
-              Submit Application & Send Details
+            <button type="submit" className="btn-submit-admission" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit Application & Send Details'}
             </button>
           </div>
 

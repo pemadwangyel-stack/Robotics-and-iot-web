@@ -26,7 +26,7 @@ const StudentSchema = new mongoose.Schema({
     attendanceCount: { type: Number, default: 0 },
     
     // --- STATUS FIELDS ---
-    status: { type: String, enum: ['Active', 'Pending', 'Completed'], default: 'Pending' }, // Default changed to 'Pending' for new admissions
+    status: { type: String, enum: ['Active', 'Pending', 'Completed', 'Paid'], default: 'Pending' }, // Added 'Paid' here
     amountPaid: { type: Number, default: 0 },
 
     // --- EXTRA FIELDS (for frontend compatibility) ---

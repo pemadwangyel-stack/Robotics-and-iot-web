@@ -29,8 +29,58 @@ router.post('/register', async (req, res) => {
     try {
         console.log("📥 Incoming Form Body Data:", req.body);
 
-        // Create a new student record using the data sent from the frontend form
-        const newStudent = new Student(req.body);
+        const {
+            fullName,
+            dob,
+            gender,
+            citizenshipStatus,
+            cidNumber,
+            passportNumber,
+            schoolName,
+            className,
+            mobileNumber,
+            isWhatsAppSame,
+            whatsAppNumber,
+            emailAddress,
+            guardianName,
+            relationship,
+            courseTrack,
+            safetyConsent
+        } = req.body;
+
+        // Safely parse date or fallback to current date if missing
+        const parsedDob = dob ? new Date(dob) : new Date();
+
+        // Map and sanitize the incoming frontend payload to avoid Schema validation rejections
+        const studentData = {
+            fullName: fullName || 'N/A',
+            dob: isNaN(parsedDob.getTime()) ? new Date() : parsedDob,
+            gender: gender || 'Other',
+            citizenshipStatus: citizenshipStatus || 'Bhutanese',
+            cidNumber: cidNumber || '',
+            passportNumber: passportNumber || '',
+            schoolName: schoolName || 'N/A',
+            className: className || 'N/A',
+            mobileNumber: mobileNumber || 'N/A',
+            isWhatsAppSame: Boolean(isWhatsAppSame),
+            whatsAppNumber: whatsAppNumber || mobileNumber || '',
+            emailAddress: emailAddress || 'N/A',
+            guardianName: guardianName || '',
+            relationship: relationship || '',
+            courseTrack: courseTrack || 'General',
+            safetyConsent: Boolean(safetyConsent),
+            
+            // Explicitly set safe schema default values
+            status: 'Pending',
+            paymentStatus: 'Pending',
+            feesPaid: 0,
+            totalFees: 7500,
+            attendanceCount: 0,
+            amountPaid: 0
+        };
+
+        // Create a new student record
+        const newStudent = new Student(studentData);
         
         // Save directly to MongoDB Atlas
         await newStudent.save();
