@@ -11,7 +11,7 @@ function StaffLogin({ onLoginSuccess, onCancel }) {
     setErrorMessage('');
 
     // 🔒 Define secure admin credentials directly here
-    const ADMIN_EMAIL = 'admin@riti.edu.bt';
+    const ADMIN_EMAIL = 'youthroboticsiot@gmail.com';
     const ADMIN_PASS = 'Bhutan@2026';
 
     if (email.toLowerCase().trim() === ADMIN_EMAIL && password === ADMIN_PASS) {

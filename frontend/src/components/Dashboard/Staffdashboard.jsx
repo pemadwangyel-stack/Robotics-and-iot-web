@@ -107,6 +107,33 @@ const generateYearOptions = () => {
   return years;
 };
 
+// ===== UNIFIED CLASS OPTIONS (PP to Class 12 + Degree Categories) =====
+const getUnifiedClassOptions = () => {
+  return [
+    // PP (Pre-Primary)
+    { value: 'PP', label: 'PP (Pre-Primary)' },
+    // Classes 1 to 12
+    { value: 'Class 1', label: 'Class 1' },
+    { value: 'Class 2', label: 'Class 2' },
+    { value: 'Class 3', label: 'Class 3' },
+    { value: 'Class 4', label: 'Class 4' },
+    { value: 'Class 5', label: 'Class 5' },
+    { value: 'Class 6', label: 'Class 6' },
+    { value: 'Class 7', label: 'Class 7' },
+    { value: 'Class 8', label: 'Class 8' },
+    { value: 'Class 9', label: 'Class 9' },
+    { value: 'Class 10', label: 'Class 10' },
+    { value: 'Class 11', label: 'Class 11' },
+    { value: 'Class 12', label: 'Class 12' },
+    // Degree Categories (Simplified)
+    { value: 'Bachelor Degree', label: 'Bachelor Degree' },
+    { value: 'Master Degree', label: 'Master Degree' },
+    { value: 'PhD', label: 'PhD' },
+    { value: 'Diploma', label: 'Diploma' },
+    { value: 'Certificate', label: 'Certificate' },
+  ];
+};
+
 function StaffDashboard({ onLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -115,7 +142,7 @@ function StaffDashboard({ onLogout }) {
   const [activePage, setActivePage] = useState('dashboard');
   const [greeting, setGreeting] = useState('');
   const [yearOptions, setYearOptions] = useState(generateYearOptions());
-
+  const [unifiedClassOptions, setUnifiedClassOptions] = useState(getUnifiedClassOptions());
 
   const fetchAdmissionsData = async () => {
     try {
@@ -123,7 +150,6 @@ function StaffDashboard({ onLogout }) {
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       
-      // 🛡️ Safe checks to prevent .filter() crashes!
       if (Array.isArray(data)) {
         setAdmissions(data); 
       } else if (data && Array.isArray(data.data)) {
@@ -131,19 +157,18 @@ function StaffDashboard({ onLogout }) {
       } else if (data && Array.isArray(data.students)) {
         setAdmissions(data.students);
       } else {
-        setAdmissions([]); // Safely falls back to an empty list
+        setAdmissions([]);
       }
 
     } catch (error) {
       console.error("Error fetching data from MongoDB:", error);
-      setAdmissions([]); // Safely falls back to an empty list on error
+      setAdmissions([]);
     }
   };
 
   useEffect(() => {
     fetchAdmissionsData();
   }, []);
-
 
   // Toast state
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -163,13 +188,12 @@ function StaffDashboard({ onLogout }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
-  // Enroll form state
+  // Enroll form state - UNIFIED CLASS (PP to Degree Categories)
   const [showEnrollForm, setShowEnrollForm] = useState(false);
   const [enrollForm, setEnrollForm] = useState({
     name: '',
     class: '',
     school: '',
-    age: '',
     guardian: '',
     phone: '',
     address: '',
@@ -190,7 +214,7 @@ function StaffDashboard({ onLogout }) {
     remarks: ''
   });
 
-  // Payment form state - UPDATED with transactionNo field
+  // Payment form state
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
     student: '',
@@ -202,7 +226,7 @@ function StaffDashboard({ onLogout }) {
   });
   const [editingPaymentId, setEditingPaymentId] = useState(null);
 
-  // Staff state
+  // Staff state - UPDATED with joinDate
   const [staffMembers, setStaffMembers] = useState(() => {
     return loadFromStorage(STORAGE_KEYS.STAFF, []);
   });
@@ -213,6 +237,7 @@ function StaffDashboard({ onLogout }) {
     role: '',
     email: '',
     phone: '',
+    joinDate: new Date().toISOString().split('T')[0], // Added joinDate field
     status: 'Active'
   });
   const [editingStaffId, setEditingStaffId] = useState(null);
@@ -493,7 +518,8 @@ function StaffDashboard({ onLogout }) {
               ...p,
               _id: p._id || p.id,
               amount: typeof p.amount === 'number' ? 'Nu.' + p.amount.toLocaleString() : p.amount,
-              student: p.studentName || p.student
+              student: p.studentName || p.student,
+              transactionNo: p.transactionNo || p.receipt || 'N/A'
             };
           });
           setPayments(formattedPayments);
@@ -520,7 +546,6 @@ function StaffDashboard({ onLogout }) {
         console.log('Attendance endpoint not available, using local data');
       }
 
-      // Fetch admissions
       try {
         const admissionsData = await callApi('/api/admissions');
         if (admissionsData && admissionsData.data && admissionsData.data.length > 0) {
@@ -531,7 +556,6 @@ function StaffDashboard({ onLogout }) {
         console.log('Admissions endpoint not available, using local data');
       }
 
-      // Fetch announcements
       try {
         const announcementsData = await callApi('/api/announcements/all');
         if (announcementsData && announcementsData.data && announcementsData.data.length > 0) {
@@ -598,7 +622,6 @@ function StaffDashboard({ onLogout }) {
     const activeStudents = Array.isArray(students) ? students.filter(s => s.status === 'Active').length : 0;
     const feeCollection = typeof calculateTotalCollected === 'function' ? calculateTotalCollected() : 0;
     
-    // 🛡️ CRASH SHIELD ADDED HERE:
     const pendingAdmissions = Array.isArray(admissions) ? admissions.filter(a => a.status === 'Pending').length : 0;
 
     setStats({
@@ -621,7 +644,6 @@ function StaffDashboard({ onLogout }) {
 
   // ===== ADMISSION STATS =====
   const updateAdmissionStats = (admissionsData) => {
-    // 🛡️ Safe check: Make sure admissionsData is a real array, otherwise default to empty list
     const safeData = Array.isArray(admissionsData) ? admissionsData : [];
 
     const total = safeData.length;
@@ -689,7 +711,6 @@ function StaffDashboard({ onLogout }) {
           class: approvedAdmission.courseTrack || approvedAdmission.class || 'N/A',
           courseTrack: approvedAdmission.courseTrack || approvedAdmission.class || 'N/A',
           school: approvedAdmission.school || 'N/A',
-          age: approvedAdmission.age || 0,
           guardian: approvedAdmission.guardianName || approvedAdmission.guardian || 'N/A',
           guardianName: approvedAdmission.guardianName || approvedAdmission.guardian || 'N/A',
           phone: approvedAdmission.mobileNumber || approvedAdmission.phone || 'N/A',
@@ -1059,9 +1080,8 @@ function StaffDashboard({ onLogout }) {
     if (showEnrollForm) {
       setEnrollForm({ 
         name: '', 
-        class: '', 
+        class: '',
         school: '', 
-        age: '', 
         guardian: '', 
         phone: '', 
         address: '',
@@ -1085,7 +1105,7 @@ function StaffDashboard({ onLogout }) {
   const handleEnrollSubmit = async function(e) {
     e.preventDefault();
     
-    if (!enrollForm.name || !enrollForm.class || !enrollForm.school || !enrollForm.age || !enrollForm.guardian || !enrollForm.phone) {
+    if (!enrollForm.name || !enrollForm.class || !enrollForm.school || !enrollForm.guardian || !enrollForm.phone) {
       showToast('⚠️ Please fill all required fields!', 'error');
       return;
     }
@@ -1095,9 +1115,9 @@ function StaffDashboard({ onLogout }) {
     try {
       var studentData = {
         fullName: enrollForm.name,
-        courseTrack: 'Class ' + enrollForm.class,
+        courseTrack: enrollForm.class,
+        class: enrollForm.class,
         school: enrollForm.school,
-        age: parseInt(enrollForm.age, 10),
         guardianName: enrollForm.guardian,
         mobileNumber: enrollForm.phone,
         address: enrollForm.address || 'N/A',
@@ -1120,7 +1140,7 @@ function StaffDashboard({ onLogout }) {
               return Object.assign({}, s, studentData, { 
                 _id: editingStudentId, 
                 name: studentData.fullName, 
-                class: studentData.courseTrack, 
+                class: enrollForm.class,
                 guardian: studentData.guardianName, 
                 phone: studentData.mobileNumber,
                 email: studentData.email,
@@ -1132,7 +1152,7 @@ function StaffDashboard({ onLogout }) {
           });
         });
         
-        showSuccessModal('Student Updated! ✏️', enrollForm.name + ' updated successfully', 'Class: Class ' + enrollForm.class);
+        showSuccessModal('Student Updated! ✏️', enrollForm.name + ' updated successfully', 'Class: ' + enrollForm.class);
         showToast('✅ ' + enrollForm.name + ' updated successfully!', 'success');
       } else {
         if (isBackendConnected && API_BASE) {
@@ -1150,10 +1170,9 @@ function StaffDashboard({ onLogout }) {
           _id: (result && result.student && result.student._id) ? result.student._id : 'student-' + Date.now(),
           name: enrollForm.name,
           fullName: enrollForm.name,
-          class: 'Class ' + enrollForm.class,
-          courseTrack: 'Class ' + enrollForm.class,
+          class: enrollForm.class,
+          courseTrack: enrollForm.class,
           school: enrollForm.school,
-          age: parseInt(enrollForm.age, 10),
           guardian: enrollForm.guardian,
           guardianName: enrollForm.guardian,
           phone: enrollForm.phone,
@@ -1178,7 +1197,7 @@ function StaffDashboard({ onLogout }) {
         };
         setNotifications([newNotification, ...notifications]);
         
-        showSuccessModal('Student Added Successfully! 🎉', enrollForm.name + ' enrolled in Class ' + enrollForm.class, 'Guardian: ' + enrollForm.guardian + ' • School: ' + enrollForm.school);
+        showSuccessModal('Student Added Successfully! 🎉', enrollForm.name + ' enrolled in ' + enrollForm.class, 'Guardian: ' + enrollForm.guardian + ' • School: ' + enrollForm.school);
         showToast('✅ ' + enrollForm.name + ' enrolled successfully!', 'success');
       }
 
@@ -1186,7 +1205,6 @@ function StaffDashboard({ onLogout }) {
         name: '', 
         class: '', 
         school: '', 
-        age: '', 
         guardian: '', 
         phone: '', 
         address: '',
@@ -1214,7 +1232,6 @@ function StaffDashboard({ onLogout }) {
       name: '', 
       class: '', 
       school: '', 
-      age: '', 
       guardian: '', 
       phone: '', 
       address: '',
@@ -1241,7 +1258,6 @@ function StaffDashboard({ onLogout }) {
         'Class: ' + student.class + 
         '\nSchool: ' + student.school + 
         '\nGuardian: ' + student.guardian + 
-        '\nAge: ' + student.age + 
         '\nPhone: ' + (student.phone || 'N/A') + 
         '\nEmail: ' + (student.email || 'N/A') +
         '\nAddress: ' + (student.address || 'N/A') + 
@@ -1264,12 +1280,10 @@ function StaffDashboard({ onLogout }) {
       }
     }
     if (student) {
-      var classNumber = student.class ? student.class.replace('Class ', '') : '';
       setEnrollForm({
         name: student.name || '',
-        class: classNumber,
+        class: student.class || '',
         school: student.school || '',
-        age: String(student.age || ''),
         guardian: student.guardian || '',
         phone: student.phone || '',
         address: student.address || '',
@@ -1516,12 +1530,19 @@ function StaffDashboard({ onLogout }) {
     updateStats();
   };
 
-  // ===== STAFF FUNCTIONS =====
+  // ===== STAFF FUNCTIONS - UPDATED WITH JOIN DATE =====
   const toggleStaffForm = function() {
     setShowStaffForm(!showStaffForm);
     setEditingStaffId(null);
     if (showStaffForm) {
-      setStaffForm({ name: '', role: '', email: '', phone: '', status: 'Active' });
+      setStaffForm({ 
+        name: '', 
+        role: '', 
+        email: '', 
+        phone: '', 
+        joinDate: new Date().toISOString().split('T')[0],
+        status: 'Active' 
+      });
     }
   };
 
@@ -1537,7 +1558,7 @@ function StaffDashboard({ onLogout }) {
 
   const handleStaffSubmit = function(e) {
     e.preventDefault();
-    if (!staffForm.name || !staffForm.role || !staffForm.email || !staffForm.phone) {
+    if (!staffForm.name || !staffForm.role || !staffForm.email || !staffForm.phone || !staffForm.joinDate) {
       showToast('⚠️ Please fill all required fields!', 'error');
       return;
     }
@@ -1550,8 +1571,9 @@ function StaffDashboard({ onLogout }) {
         role: staffForm.role,
         email: staffForm.email,
         phone: staffForm.phone,
+        joinDate: staffForm.joinDate,
         status: staffForm.status,
-        joinDate: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        joinDateFormatted: new Date(staffForm.joinDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       };
 
       if (editingStaffId) {
@@ -1567,11 +1589,18 @@ function StaffDashboard({ onLogout }) {
         showToast('✅ ' + staffForm.name + ' updated!', 'success');
       } else {
         setStaffMembers(function(prev) { return prev.concat([staffData]); });
-        showSuccessModal('Staff Member Added! 👤', staffForm.name + ' added as ' + staffForm.role, 'Email: ' + staffForm.email + ' • Phone: ' + staffForm.phone);
+        showSuccessModal('Staff Member Added! 👤', staffForm.name + ' added as ' + staffForm.role, 'Email: ' + staffForm.email + ' • Phone: ' + staffForm.phone + ' • Join Date: ' + staffData.joinDateFormatted);
         showToast('👤 ' + staffForm.name + ' added to staff!', 'success');
       }
 
-      setStaffForm({ name: '', role: '', email: '', phone: '', status: 'Active' });
+      setStaffForm({ 
+        name: '', 
+        role: '', 
+        email: '', 
+        phone: '', 
+        joinDate: new Date().toISOString().split('T')[0],
+        status: 'Active' 
+      });
       setShowStaffForm(false);
       setEditingStaffId(null);
     } catch (error) {
@@ -1583,7 +1612,14 @@ function StaffDashboard({ onLogout }) {
   const handleStaffCancel = function() {
     setShowStaffForm(false);
     setEditingStaffId(null);
-    setStaffForm({ name: '', role: '', email: '', phone: '', status: 'Active' });
+    setStaffForm({ 
+      name: '', 
+      role: '', 
+      email: '', 
+      phone: '', 
+      joinDate: new Date().toISOString().split('T')[0],
+      status: 'Active' 
+    });
     showToast('❌ Staff operation cancelled', 'info');
   };
 
@@ -1600,7 +1636,11 @@ function StaffDashboard({ onLogout }) {
       showSuccessModal(
         'Staff Details 👤',
         staff.name,
-        'Role: ' + staff.role + '\nEmail: ' + staff.email + '\nPhone: ' + staff.phone + '\nStatus: ' + staff.status + '\nJoin Date: ' + staff.joinDate
+        'Role: ' + staff.role + 
+        '\nEmail: ' + staff.email + 
+        '\nPhone: ' + staff.phone + 
+        '\nStatus: ' + staff.status + 
+        '\nJoin Date: ' + (staff.joinDateFormatted || staff.joinDate || 'N/A')
       );
     } else {
       showToast('⚠️ Staff not found!', 'error');
@@ -1622,6 +1662,7 @@ function StaffDashboard({ onLogout }) {
         role: staff.role || '',
         email: staff.email || '',
         phone: staff.phone || '',
+        joinDate: staff.joinDate || new Date().toISOString().split('T')[0],
         status: staff.status || 'Active'
       });
       setEditingStaffId(staffId);
@@ -1948,7 +1989,6 @@ function StaffDashboard({ onLogout }) {
     updateStats();
     setIsLoading(false);
     
-    // Load data from localStorage
     const savedAdmissions = loadFromStorage(STORAGE_KEYS.ADMISSIONS, []);
     setAdmissions(savedAdmissions);
     updateAdmissionStats(savedAdmissions);
@@ -1975,7 +2015,6 @@ function StaffDashboard({ onLogout }) {
     
     connectToBackend();
     
-    // Poll for new data every 30 seconds
     const pollInterval = setInterval(() => {
       if (isBackendConnected) {
         fetchAdmissions();
@@ -2115,7 +2154,7 @@ function StaffDashboard({ onLogout }) {
     }
   };
 
-  // ===== PDF GENERATION FUNCTIONS (Keep existing) =====
+  // ===== PDF GENERATION FUNCTIONS =====
   const generateStudentPDF = async function() {
     try {
       setGeneratingReport('Student');
@@ -2142,7 +2181,6 @@ function StaffDashboard({ onLogout }) {
         studentsHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;">' + s.name + '</td>';
         studentsHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;">' + s.class + '</td>';
         studentsHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;">' + s.school + '</td>';
-        studentsHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;">' + s.age + '</td>';
         studentsHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;">' + s.guardian + '</td>';
         studentsHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;">' + (s.enrollYear || 'N/A') + '</td>';
         studentsHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;"><span style="background: ' + statusColor + '; color: white; padding: 2px 10px; border-radius: 12px; font-size: 11px;">' + s.status + '</span></td>';
@@ -2180,7 +2218,6 @@ function StaffDashboard({ onLogout }) {
               '<th style="padding: 10px; text-align: left; border: 1px solid #3b82f6;">Student Name</th>' +
               '<th style="padding: 10px; text-align: left; border: 1px solid #3b82f6;">Class</th>' +
               '<th style="padding: 10px; text-align: left; border: 1px solid #3b82f6;">School</th>' +
-              '<th style="padding: 10px; text-align: left; border: 1px solid #3b82f6;">Age</th>' +
               '<th style="padding: 10px; text-align: left; border: 1px solid #3b82f6;">Guardian</th>' +
               '<th style="padding: 10px; text-align: left; border: 1px solid #3b82f6;">Enroll Year</th>' +
               '<th style="padding: 10px; text-align: left; border: 1px solid #3b82f6;">Status</th>' +
@@ -2220,6 +2257,7 @@ function StaffDashboard({ onLogout }) {
     }
   };
 
+  // ===== GENERATE PAYMENT PDF =====
   const generatePaymentPDF = async function() {
     try {
       setGeneratingReport('Payment');
@@ -2465,7 +2503,7 @@ function StaffDashboard({ onLogout }) {
         staffHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;">' + s.email + '</td>';
         staffHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;">' + s.phone + '</td>';
         staffHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;"><span style="background: ' + statusColor + '; color: white; padding: 2px 10px; border-radius: 12px; font-size: 11px;">' + s.status + '</span></td>';
-        staffHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;">' + s.joinDate + '</td>';
+        staffHtml += '<td style="padding: 8px; border: 1px solid #e2e8f0;">' + (s.joinDateFormatted || s.joinDate || 'N/A') + '</td>';
         staffHtml += '</tr>';
       }
 
@@ -2496,6 +2534,7 @@ function StaffDashboard({ onLogout }) {
               '<th style="padding: 10px; text-align: left; border: 1px solid #ec4899;">Phone</th>' +
               '<th style="padding: 10px; text-align: left; border: 1px solid #ec4899;">Status</th>' +
               '<th style="padding: 10px; text-align: left; border: 1px solid #ec4899;">Join Date</th>' +
+              '<th style="padding: 10px; text-align: left; border: 1px solid #ec4899;">Actions</th>' +
             '</tr>' +
           '</thead>' +
           '<tbody>' + staffHtml + '</tbody>' +
@@ -2755,7 +2794,6 @@ function StaffDashboard({ onLogout }) {
                 <div><strong>Student Name:</strong> {selectedAdmission.fullName || selectedAdmission.name}</div>
                 <div><strong>Class:</strong> {selectedAdmission.courseTrack || selectedAdmission.class}</div>
                 <div><strong>School:</strong> {selectedAdmission.school}</div>
-                <div><strong>Age:</strong> {selectedAdmission.age}</div>
                 <div><strong>Guardian:</strong> {selectedAdmission.guardianName || selectedAdmission.guardian}</div>
                 <div><strong>Phone:</strong> {selectedAdmission.mobileNumber || selectedAdmission.phone}</div>
                 <div><strong>Email:</strong> {selectedAdmission.email || 'N/A'}</div>
@@ -2895,7 +2933,7 @@ function StaffDashboard({ onLogout }) {
                   {searchResults.map((result) => (
                     <div key={result._id} className="search-result-item" onClick={() => { setSearchTerm(''); setSearchResults([]); viewStudent(result._id); }}>
                       <span className="result-name">{result.name}</span>
-                      <span className="result-detail">Class {result.class} • {result.school}</span>
+                      <span className="result-detail">{result.class} • {result.school}</span>
                     </div>
                   ))}
                 </div>
@@ -3078,11 +3116,11 @@ function StaffDashboard({ onLogout }) {
                 </div>
                 <div className="table-responsive">
                   <table className="data-table">
-                    <thead><tr><th>SL.No</th><th>Name of Student</th><th>Class</th><th>School</th><th>Age</th><th>Guardian</th><th>Enroll Year</th><th>Status</th><th>Action</th></tr></thead>
+                    <thead><tr><th>SL.No</th><th>Name of Student</th><th>Class / Degree</th><th>School</th><th>Guardian</th><th>Enroll Year</th><th>Status</th><th>Action</th></tr></thead>
                     <tbody>
                       {students.length === 0 ? (
                         <tr>
-                          <td colSpan="9" style={{ textAlign: 'center', padding: '40px 0', color: '#6b7280' }}>
+                          <td colSpan="8" style={{ textAlign: 'center', padding: '40px 0', color: '#6b7280' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
                               <Users size={48} style={{ color: '#d1d5db' }} />
                               <span>No students enrolled yet</span>
@@ -3103,7 +3141,6 @@ function StaffDashboard({ onLogout }) {
                             <td className="student-name">{student.name || 'N/A'}</td>
                             <td><span className="class-badge">{student.class || 'N/A'}</span></td>
                             <td>{student.school || 'N/A'}</td>
-                            <td>{student.age || 'N/A'}</td>
                             <td>{student.guardian || 'N/A'}</td>
                             <td><span className="year-badge">{student.enrollYear || 'N/A'}</span></td>
                             <td><span className={getStatusBadgeClass(student.status)}>{student.status || 'Active'}</span></td>
@@ -3201,26 +3238,36 @@ function StaffDashboard({ onLogout }) {
                       <input type="text" name="name" placeholder="Enter full name" value={enrollForm.name} onChange={handleEnrollChange} required disabled={isEnrolling} />
                     </div>
                     <div className="form-group">
-                      <label>Class *</label>
+                      <label>Class / Degree *</label>
                       <select name="class" value={enrollForm.class} onChange={handleEnrollChange} required disabled={isEnrolling}>
-                        <option value="">Select Class</option>
-                        <option value="1">Class 1</option>
-                        <option value="2">Class 2</option>
-                        <option value="3">Class 3</option>
-                        <option value="4">Class 4</option>
-                        <option value="5">Class 5</option>
-                        <option value="6">Class 6</option>
-                        <option value="7">Class 7</option>
-                        <option value="8">Class 8</option>
+                        <option value="">Select Class or Degree</option>
+                        <optgroup label="📚 PP & Classes (1-12)">
+                          <option value="PP">PP (Pre-Primary)</option>
+                          <option value="Class 1">Class 1</option>
+                          <option value="Class 2">Class 2</option>
+                          <option value="Class 3">Class 3</option>
+                          <option value="Class 4">Class 4</option>
+                          <option value="Class 5">Class 5</option>
+                          <option value="Class 6">Class 6</option>
+                          <option value="Class 7">Class 7</option>
+                          <option value="Class 8">Class 8</option>
+                          <option value="Class 9">Class 9</option>
+                          <option value="Class 10">Class 10</option>
+                          <option value="Class 11">Class 11</option>
+                          <option value="Class 12">Class 12</option>
+                        </optgroup>
+                        <optgroup label="🎓 Degree Categories">
+                          <option value="Bachelor Degree">Bachelor Degree</option>
+                          <option value="Master Degree">Master Degree</option>
+                          <option value="PhD">PhD</option>
+                          <option value="Diploma">Diploma</option>
+                          <option value="Certificate">Certificate</option>
+                        </optgroup>
                       </select>
                     </div>
                     <div className="form-group">
                       <label>School *</label>
                       <input type="text" name="school" placeholder="Enter school name" value={enrollForm.school} onChange={handleEnrollChange} required disabled={isEnrolling} />
-                    </div>
-                    <div className="form-group">
-                      <label>Age *</label>
-                      <input type="number" name="age" placeholder="Enter age" value={enrollForm.age} onChange={handleEnrollChange} required disabled={isEnrolling} min="5" max="18" />
                     </div>
                     <div className="form-group">
                       <label>Guardian Name *</label>
@@ -3282,9 +3329,8 @@ function StaffDashboard({ onLogout }) {
                   <thead><tr>
                     <th>SL.No</th>
                     <th>Name of Student</th>
-                    <th>Class</th>
+                    <th>Class / Degree</th>
                     <th>School</th>
-                    <th>Age</th>
                     <th>Guardian</th>
                     <th>Enroll Year</th>
                     <th>Status</th>
@@ -3293,7 +3339,7 @@ function StaffDashboard({ onLogout }) {
                   <tbody>
                     {students.length === 0 ? (
                       <tr>
-                        <td colSpan="9" style={{ textAlign: 'center', padding: '40px 0', color: '#6b7280' }}>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '40px 0', color: '#6b7280' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
                             <Users size={48} style={{ color: '#d1d5db' }} />
                             <span>No students enrolled yet</span>
@@ -3315,7 +3361,6 @@ function StaffDashboard({ onLogout }) {
                             <td className="student-name">{student.name || 'N/A'}</td>
                             <td><span className="class-badge">{student.class || 'N/A'}</span></td>
                             <td>{student.school || 'N/A'}</td>
-                            <td>{student.age || 'N/A'}</td>
                             <td>{student.guardian || 'N/A'}</td>
                             <td><span className="year-badge">{student.enrollYear || 'N/A'}</span></td>
                             <td><span className={getStatusBadgeClass(student.status)}>{student.status || 'Active'}</span></td>
@@ -3649,7 +3694,7 @@ function StaffDashboard({ onLogout }) {
           </div>
         )}
 
-        {/* ===== STAFF PAGE ===== */}
+        {/* ===== STAFF PAGE - UPDATED WITH JOIN DATE ===== */}
         {activePage === 'staff' && (
           <div className="page-container">
             <div className="page-header">
@@ -3667,18 +3712,34 @@ function StaffDashboard({ onLogout }) {
               <div className="enroll-form-container">
                 <form className="enroll-form" onSubmit={handleStaffSubmit}>
                   <div className="form-grid">
-                    <div className="form-group"><label>Full Name *</label><input type="text" name="name" placeholder="Enter full name" value={staffForm.name} onChange={handleStaffChange} required /></div>
-                    <div className="form-group"><label>Role *</label>
+                    <div className="form-group">
+                      <label>Full Name *</label>
+                      <input type="text" name="name" placeholder="Enter full name" value={staffForm.name} onChange={handleStaffChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Role *</label>
                       <select name="role" value={staffForm.role} onChange={handleStaffChange} required>
                         <option value="">Select Role</option>
+                        <option value="CEO">CEO</option>
                         <option value="Instructor">Instructor</option>
                         <option value="Administrator">Administrator</option>
                         <option value="Management">Management</option>
                       </select>
                     </div>
-                    <div className="form-group"><label>Email *</label><input type="email" name="email" placeholder="Enter email" value={staffForm.email} onChange={handleStaffChange} required /></div>
-                    <div className="form-group"><label>Phone *</label><input type="tel" name="phone" placeholder="Enter phone number" value={staffForm.phone} onChange={handleStaffChange} required /></div>
-                    <div className="form-group"><label>Status</label>
+                    <div className="form-group">
+                      <label>Email *</label>
+                      <input type="email" name="email" placeholder="Enter email" value={staffForm.email} onChange={handleStaffChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Phone *</label>
+                      <input type="tel" name="phone" placeholder="Enter phone number" value={staffForm.phone} onChange={handleStaffChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Joining Date *</label>
+                      <input type="date" name="joinDate" value={staffForm.joinDate} onChange={handleStaffChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Status</label>
                       <select name="status" value={staffForm.status} onChange={handleStaffChange}>
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
@@ -3708,7 +3769,18 @@ function StaffDashboard({ onLogout }) {
               </div>
               <div className="table-responsive">
                 <table className="data-table">
-                  <thead><tr><th>ID</th><th>Name</th><th>Role</th><th>Email</th><th>Phone</th><th>Status</th><th>Join Date</th><th>Actions</th></tr></thead>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Role</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Join Date</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {staffMembers.length === 0 ? (
                       <tr>
@@ -3726,8 +3798,8 @@ function StaffDashboard({ onLogout }) {
                             <td><span className="role-badge">{staff.role}</span></td>
                             <td>{staff.email}</td>
                             <td>{staff.phone}</td>
+                            <td>{staff.joinDateFormatted || staff.joinDate || 'N/A'}</td>
                             <td><span className={`status-badge ${staff.status.toLowerCase()}`}>{staff.status}</span></td>
-                            <td>{staff.joinDate}</td>
                             <td>
                               <div className="action-buttons">
                                 <button className="action-btn-small view" onClick={() => viewStaff(staffId)} title="View"><Eye size={14} /></button>
@@ -3775,7 +3847,6 @@ function StaffDashboard({ onLogout }) {
               </div>
             </div>
 
-            {/* Admission Stats Cards */}
             <div className="admission-stats-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
@@ -3827,7 +3898,6 @@ function StaffDashboard({ onLogout }) {
               </div>
             </div>
 
-            {/* Filter Buttons */}
             <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
               {['all', 'pending', 'approved', 'rejected'].map(filter => (
                 <button 
@@ -3850,7 +3920,6 @@ function StaffDashboard({ onLogout }) {
               ))}
             </div>
 
-            {/* Admissions Table */}
             <div className="table-card">
               <div className="table-header">
                 <h3>Student Applications</h3>
@@ -3866,7 +3935,7 @@ function StaffDashboard({ onLogout }) {
                     <tr>
                       <th>#</th>
                       <th>Student Name</th>
-                      <th>Class</th>
+                      <th>Class / Degree</th>
                       <th>School</th>
                       <th>Guardian</th>
                       <th>Phone</th>
@@ -3981,7 +4050,6 @@ function StaffDashboard({ onLogout }) {
               </button>
             </div>
 
-            {/* Announcement Stats Cards */}
             <div className="announcement-stats-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
@@ -4033,7 +4101,6 @@ function StaffDashboard({ onLogout }) {
               </div>
             </div>
 
-            {/* Filter Buttons */}
             <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
               {['all', 'published', 'pending', 'draft', 'archived'].map(filter => (
                 <button 
@@ -4059,7 +4126,6 @@ function StaffDashboard({ onLogout }) {
               ))}
             </div>
 
-            {/* Announcement Form */}
             {showAnnouncementForm && (
               <div className="enroll-form-container" style={{ marginBottom: '24px' }}>
                 <form className="enroll-form" onSubmit={handleAnnouncementSubmit}>
@@ -4151,7 +4217,6 @@ function StaffDashboard({ onLogout }) {
               </div>
             )}
 
-            {/* Announcements Table */}
             <div className="table-card">
               <div className="table-header">
                 <h3>All Announcements</h3>
@@ -4279,7 +4344,6 @@ function StaffDashboard({ onLogout }) {
                 </div>
               </div>
 
-              {/* ===== CLEAR DATA BUTTON ===== */}
               <div className="settings-card" style={{ border: '2px solid #ef4444' }}>
                 <h4 style={{ color: '#ef4444' }}>⚠️ Danger Zone</h4>
                 <div className="settings-item">
@@ -4332,7 +4396,5 @@ function StaffDashboard({ onLogout }) {
     </div>
   );
 }
-
-
 
 export default StaffDashboard;

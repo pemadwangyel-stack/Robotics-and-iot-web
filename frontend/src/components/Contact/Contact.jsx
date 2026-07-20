@@ -56,7 +56,7 @@ function Contact() {
               <span style={{ fontSize: '1.1rem', marginTop: '2px' }}>📍</span> 
               <span>
                 <strong>Address:</strong><br />
-                Gekpha Lam, Opposite to old Zangtopelri Lhakhang,<br />
+                Gepkha Lam, Opposite to old Zangtopelri Lhakhang,<br />
                 Thimphu, Bhutan, 11001
               </span>
             </li>
@@ -66,8 +66,8 @@ function Contact() {
               <span style={{ fontSize: '1.1rem' }}>📞</span> 
               <span>
                 <strong>Mobile:</strong>{' '}
-                <a href="tel:+97517621843" style={{ color: '#cbd5e1', textDecoration: 'none' }}>
-                  +975 17621843
+                <a href="tel:+97517906057" style={{ color: '#cbd5e1', textDecoration: 'none' }}>
+                  +975 17906057
                 </a>
               </span>
             </li>
