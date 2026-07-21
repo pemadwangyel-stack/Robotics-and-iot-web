@@ -110,9 +110,7 @@ const generateYearOptions = () => {
 // ===== UNIFIED CLASS OPTIONS (PP to Class 12 + Degree Categories) =====
 const getUnifiedClassOptions = () => {
   return [
-    // PP (Pre-Primary)
     { value: 'PP', label: 'PP (Pre-Primary)' },
-    // Classes 1 to 12
     { value: 'Class 1', label: 'Class 1' },
     { value: 'Class 2', label: 'Class 2' },
     { value: 'Class 3', label: 'Class 3' },
@@ -125,7 +123,6 @@ const getUnifiedClassOptions = () => {
     { value: 'Class 10', label: 'Class 10' },
     { value: 'Class 11', label: 'Class 11' },
     { value: 'Class 12', label: 'Class 12' },
-    // Degree Categories (Simplified)
     { value: 'Bachelor Degree', label: 'Bachelor Degree' },
     { value: 'Master Degree', label: 'Master Degree' },
     { value: 'PhD', label: 'PhD' },
@@ -143,32 +140,6 @@ function StaffDashboard({ onLogout }) {
   const [greeting, setGreeting] = useState('');
   const [yearOptions, setYearOptions] = useState(generateYearOptions());
   const [unifiedClassOptions, setUnifiedClassOptions] = useState(getUnifiedClassOptions());
-
-  const fetchAdmissionsData = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/dashboard/students'); 
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
-      
-      if (Array.isArray(data)) {
-        setAdmissions(data); 
-      } else if (data && Array.isArray(data.data)) {
-        setAdmissions(data.data); 
-      } else if (data && Array.isArray(data.students)) {
-        setAdmissions(data.students);
-      } else {
-        setAdmissions([]);
-      }
-
-    } catch (error) {
-      console.error("Error fetching data from MongoDB:", error);
-      setAdmissions([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchAdmissionsData();
-  }, []);
 
   // Toast state
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -188,7 +159,7 @@ function StaffDashboard({ onLogout }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
-  // Enroll form state - UNIFIED CLASS (PP to Degree Categories)
+  // Enroll form state
   const [showEnrollForm, setShowEnrollForm] = useState(false);
   const [enrollForm, setEnrollForm] = useState({
     name: '',
@@ -226,7 +197,7 @@ function StaffDashboard({ onLogout }) {
   });
   const [editingPaymentId, setEditingPaymentId] = useState(null);
 
-  // Staff state - UPDATED with joinDate
+  // Staff state
   const [staffMembers, setStaffMembers] = useState(() => {
     return loadFromStorage(STORAGE_KEYS.STAFF, []);
   });
@@ -237,7 +208,7 @@ function StaffDashboard({ onLogout }) {
     role: '',
     email: '',
     phone: '',
-    joinDate: new Date().toISOString().split('T')[0], // Added joinDate field
+    joinDate: new Date().toISOString().split('T')[0],
     status: 'Active'
   });
   const [editingStaffId, setEditingStaffId] = useState(null);
@@ -257,9 +228,19 @@ function StaffDashboard({ onLogout }) {
   });
   const [editingAttendanceId, setEditingAttendanceId] = useState(null);
 
-  // ===== ADMISSIONS STATE =====
+  // ===== ADMISSIONS STATE - FIXED to load from localStorage directly =====
   const [admissions, setAdmissions] = useState(() => {
-    return loadFromStorage(STORAGE_KEYS.ADMISSIONS, []);
+    try {
+      const saved = localStorage.getItem('dashboard_admissions');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        console.log('📋 Admissions loaded on init:', parsed.length);
+        return parsed;
+      }
+    } catch (e) {
+      console.error('Error loading admissions:', e);
+    }
+    return [];
   });
 
   const [showAdmissionDetails, setShowAdmissionDetails] = useState(false);
@@ -306,7 +287,7 @@ function StaffDashboard({ onLogout }) {
     }
     return {
       fullName: 'Admin User',
-      email: 'admin@riti.edu.bt',
+      email: 'youthroboticsiot@gmail.com',
       phone: '+975 17621843',
       instituteName: 'Robotics & IoT Center',
       location: 'Thimphu, Bhutan',
@@ -401,8 +382,10 @@ function StaffDashboard({ onLogout }) {
     saveToStorage(STORAGE_KEYS.SETTINGS, settings);
   }, [settings]);
 
+  // ===== SAVE ADMISSIONS TO LOCALSTORAGE - FIXED =====
   useEffect(() => {
-    saveToStorage(STORAGE_KEYS.ADMISSIONS, admissions);
+    localStorage.setItem('dashboard_admissions', JSON.stringify(admissions));
+    console.log('💾 Admissions saved to localStorage:', admissions.length);
   }, [admissions]);
 
   useEffect(() => {
@@ -642,14 +625,16 @@ function StaffDashboard({ onLogout }) {
     updateAdmissionStats(admissions);
   };
 
-  // ===== ADMISSION STATS =====
+  // ===== ADMISSION STATS - FIXED =====
   const updateAdmissionStats = (admissionsData) => {
     const safeData = Array.isArray(admissionsData) ? admissionsData : [];
 
+    console.log('📊 Updating admission stats with:', safeData.length, 'applications');
+
     const total = safeData.length;
-    const pending = safeData.filter(a => a.status === 'Pending').length;
-    const approved = safeData.filter(a => a.status === 'Approved').length;
-    const rejected = safeData.filter(a => a.status === 'Rejected').length;
+    const pending = safeData.filter(a => a.status === 'Pending' || a.status === 'pending').length;
+    const approved = safeData.filter(a => a.status === 'Approved' || a.status === 'approved').length;
+    const rejected = safeData.filter(a => a.status === 'Rejected' || a.status === 'rejected').length;
     
     setAdmissionStats({
       total,
@@ -659,34 +644,73 @@ function StaffDashboard({ onLogout }) {
     });
   };
 
-  // ===== ADMISSION FUNCTIONS =====
+  // ===== ADMISSION FUNCTIONS - FIXED (No Backend Required) =====
   const fetchAdmissions = async () => {
-    if (isBackendConnected && API_BASE) {
+    console.log('🔄 Fetching admissions...');
+    
+    // Load from localStorage directly
+    const localAdmissions = localStorage.getItem('dashboard_admissions');
+    let admissionsData = [];
+    if (localAdmissions) {
       try {
-        const data = await callApi('/api/admissions');
-        if (data && data.data) {
-          setAdmissions(data.data);
-          updateAdmissionStats(data.data);
-          return;
-        }
+        admissionsData = JSON.parse(localAdmissions);
+        console.log('📋 Loaded admissions from localStorage:', admissionsData.length);
       } catch (e) {
-        console.log('Failed to fetch admissions from backend:', e.message);
+        console.error('Error parsing admissions:', e);
+        admissionsData = [];
       }
     }
-    const localAdmissions = loadFromStorage(STORAGE_KEYS.ADMISSIONS, []);
-    setAdmissions(localAdmissions);
-    updateAdmissionStats(localAdmissions);
+    setAdmissions(admissionsData);
+    updateAdmissionStats(admissionsData);
   };
 
+  // ===== DELETE REJECTED ADMISSION - NEW FUNCTION =====
+  const deleteRejectedAdmission = async (admissionId) => {
+    const admission = admissions.find(a => a.id === admissionId || a._id === admissionId);
+    if (!admission) {
+      showToast('⚠️ Admission not found!', 'error');
+      return;
+    }
+
+    if (admission.status !== 'Rejected' && admission.status !== 'rejected') {
+      showToast('⚠️ Only rejected admissions can be deleted!', 'error');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete the rejected application for "${admission.fullName || admission.name}"?\n\nThis action cannot be undone!`
+    );
+    
+    if (!confirmed) return;
+
+    try {
+      const updatedAdmissions = admissions.filter(a => 
+        (a.id !== admissionId && a._id !== admissionId)
+      );
+      
+      // Save to localStorage
+      localStorage.setItem('dashboard_admissions', JSON.stringify(updatedAdmissions));
+      setAdmissions(updatedAdmissions);
+      updateAdmissionStats(updatedAdmissions);
+      
+      showSuccessModal(
+        '🗑️ Rejected Application Deleted',
+        `${admission.fullName || admission.name}'s application has been removed`,
+        'This helps keep the admissions list clean and manageable',
+        React.createElement(Trash2, { size: 48, color: '#ef4444' })
+      );
+      showToast(`🗑️ ${admission.fullName || admission.name}'s rejected application deleted!`, 'success');
+      
+      updateStats();
+    } catch (error) {
+      console.error('❌ Delete rejected admission error:', error);
+      showToast('❌ Failed to delete rejected admission: ' + error.message, 'error');
+    }
+  };
+
+  // FIXED: Approve Admission - localStorage only
   const approveAdmission = async (admissionId) => {
     try {
-      if (isBackendConnected && API_BASE) {
-        await callApi(`/api/admissions/approve/${admissionId}`, {
-          method: 'PUT',
-          body: JSON.stringify({ adminName: settings.fullName || 'Admin' })
-        });
-      }
-
       const updatedAdmissions = admissions.map(a => {
         if (a.id === admissionId || a._id === admissionId) {
           return {
@@ -699,6 +723,8 @@ function StaffDashboard({ onLogout }) {
         return a;
       });
       
+      // Save to localStorage
+      localStorage.setItem('dashboard_admissions', JSON.stringify(updatedAdmissions));
       setAdmissions(updatedAdmissions);
       updateAdmissionStats(updatedAdmissions);
       
@@ -720,7 +746,7 @@ function StaffDashboard({ onLogout }) {
           status: 'Active',
           paymentStatus: 'Pending',
           feesPaid: 0,
-          totalFees: approvedAdmission.totalFees || 7500,
+          totalFees: approvedAdmission.totalFee || 7500,
           amountPaid: 0,
           enrollYear: approvedAdmission.enrollYear || new Date().getFullYear().toString(),
           source: 'Public Admission'
@@ -750,30 +776,27 @@ function StaffDashboard({ onLogout }) {
     }
   };
 
+  // FIXED: Reject Admission - localStorage only
   const rejectAdmission = async (admissionId) => {
     const reason = prompt('Enter reason for rejection:');
     if (reason === null) return;
     
     try {
-      if (isBackendConnected && API_BASE) {
-        await callApi(`/api/admissions/reject/${admissionId}`, {
-          method: 'PUT',
-          body: JSON.stringify({ reason })
-        });
-      }
-
       const updatedAdmissions = admissions.map(a => {
         if (a.id === admissionId || a._id === admissionId) {
           return {
             ...a,
             status: 'Rejected',
             rejectionReason: reason || 'No reason provided',
-            rejectedAt: new Date().toISOString()
+            rejectedAt: new Date().toISOString(),
+            rejectedBy: settings.fullName || 'Admin'
           };
         }
         return a;
       });
       
+      // Save to localStorage
+      localStorage.setItem('dashboard_admissions', JSON.stringify(updatedAdmissions));
       setAdmissions(updatedAdmissions);
       updateAdmissionStats(updatedAdmissions);
       
@@ -781,10 +804,10 @@ function StaffDashboard({ onLogout }) {
       showSuccessModal(
         '❌ Admission Rejected',
         `${rejectedAdmission?.fullName || rejectedAdmission?.name} has been rejected`,
-        `Reason: ${reason || 'No reason provided'}`,
+        `Reason: ${reason || 'No reason provided'}\n\nYou can delete this record later to keep the list clean.`,
         React.createElement(XCircle, { size: 48, color: '#ef4444' })
       );
-      showToast(`❌ Admission rejected!`, 'success');
+      showToast(`❌ ${rejectedAdmission?.fullName || rejectedAdmission?.name} rejected!`, 'success');
       updateStats();
     } catch (error) {
       console.error('❌ Rejection error:', error);
@@ -1530,7 +1553,7 @@ function StaffDashboard({ onLogout }) {
     updateStats();
   };
 
-  // ===== STAFF FUNCTIONS - UPDATED WITH JOIN DATE =====
+  // ===== STAFF FUNCTIONS =====
   const toggleStaffForm = function() {
     setShowStaffForm(!showStaffForm);
     setEditingStaffId(null);
@@ -1880,9 +1903,9 @@ function StaffDashboard({ onLogout }) {
 
   // ===== GET ADMISSION STATUS BADGE =====
   const getAdmissionStatusBadge = function(status) {
-    if (status === 'Pending') return 'status-badge pending';
-    if (status === 'Approved') return 'status-badge approved';
-    if (status === 'Rejected') return 'status-badge rejected';
+    if (status === 'Pending' || status === 'pending') return 'status-badge pending';
+    if (status === 'Approved' || status === 'approved') return 'status-badge approved';
+    if (status === 'Rejected' || status === 'rejected') return 'status-badge rejected';
     return 'status-badge';
   };
 
@@ -1978,7 +2001,7 @@ function StaffDashboard({ onLogout }) {
     }
   };
 
-  // ===== INITIAL LOAD =====
+  // ===== INITIAL LOAD - FIXED =====
   useEffect(function() {
     updateGreeting();
     
@@ -1989,9 +2012,21 @@ function StaffDashboard({ onLogout }) {
     updateStats();
     setIsLoading(false);
     
-    const savedAdmissions = loadFromStorage(STORAGE_KEYS.ADMISSIONS, []);
-    setAdmissions(savedAdmissions);
-    updateAdmissionStats(savedAdmissions);
+    // FIXED: Load admissions from localStorage on mount
+    try {
+      const savedAdmissions = localStorage.getItem('dashboard_admissions');
+      let admissionsData = [];
+      if (savedAdmissions) {
+        admissionsData = JSON.parse(savedAdmissions);
+        console.log('📋 Admissions loaded on mount:', admissionsData.length);
+      }
+      setAdmissions(admissionsData);
+      updateAdmissionStats(admissionsData);
+    } catch (e) {
+      console.error('Error loading admissions on mount:', e);
+      setAdmissions([]);
+      updateAdmissionStats([]);
+    }
     
     const savedAnnouncements = loadFromStorage(STORAGE_KEYS.ANNOUNCEMENTS, []);
     setAnnouncements(savedAnnouncements);
@@ -2257,7 +2292,6 @@ function StaffDashboard({ onLogout }) {
     }
   };
 
-  // ===== GENERATE PAYMENT PDF =====
   const generatePaymentPDF = async function() {
     try {
       setGeneratingReport('Payment');
@@ -2801,7 +2835,22 @@ function StaffDashboard({ onLogout }) {
                 <div><strong>Submitted:</strong> {new Date(selectedAdmission.submittedAt || selectedAdmission.createdAt).toLocaleString()}</div>
                 <div><strong>Status:</strong> <span className={getAdmissionStatusBadge(selectedAdmission.status)}>{selectedAdmission.status}</span></div>
                 {selectedAdmission.status === 'Rejected' && (
-                  <div style={{ gridColumn: 'span 2' }}><strong>Rejection Reason:</strong> {selectedAdmission.rejectionReason || 'N/A'}</div>
+                  <>
+                    <div style={{ gridColumn: 'span 2' }}><strong>Rejection Reason:</strong> {selectedAdmission.rejectionReason || 'N/A'}</div>
+                    <div style={{ gridColumn: 'span 2' }}>
+                      <button 
+                        className="btn-cancel" 
+                        onClick={() => {
+                          const id = selectedAdmission.id || selectedAdmission._id;
+                          setShowAdmissionDetails(false);
+                          deleteRejectedAdmission(id);
+                        }} 
+                        style={{ background: '#ef4444', color: 'white', width: '100%', padding: '10px' }}
+                      >
+                        <Trash2 size={16} /> Delete This Rejected Application
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
               <div style={{ marginTop: '20px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
@@ -3008,7 +3057,7 @@ function StaffDashboard({ onLogout }) {
                     <img src="/logo.jpg" alt="Admin" className="dropdown-avatar" />
                     <div>
                       <div className="dropdown-name">Admin</div>
-                      <div className="dropdown-email">admin@riti.edu.bt</div>
+                      <div className="dropdown-email">youthroboticsiot@gmail.com</div>
                     </div>
                   </div>
                   <div className="user-dropdown-divider"></div>
@@ -3028,7 +3077,7 @@ function StaffDashboard({ onLogout }) {
           </div>
         </header>
 
-        {/* ===== DASHBOARD PAGE ===== */}
+        {/* DASHBOARD PAGE */}
         {activePage === 'dashboard' && (
           <>
             <div className="stats-grid">
@@ -3215,7 +3264,7 @@ function StaffDashboard({ onLogout }) {
           </>
         )}
 
-        {/* ===== ENROLL STUDENT PAGE ===== */}
+        {/* ENROLL STUDENT PAGE */}
         {activePage === 'enroll' && (
           <div className="page-container">
             <div className="page-header">
@@ -3387,7 +3436,7 @@ function StaffDashboard({ onLogout }) {
           </div>
         )}
 
-        {/* ===== PAYMENTS PAGE ===== */}
+        {/* PAYMENTS PAGE */}
         {activePage === 'payments' && (
           <div className="page-container">
             <div className="page-header">
@@ -3542,7 +3591,7 @@ function StaffDashboard({ onLogout }) {
           </div>
         )}
 
-        {/* ===== REPORTS PAGE ===== */}
+        {/* REPORTS PAGE */}
         {activePage === 'reports' && (
           <div className="page-container">
             <div className="page-header">
@@ -3612,7 +3661,7 @@ function StaffDashboard({ onLogout }) {
           </div>
         )}
 
-        {/* ===== ATTENDANCE PAGE ===== */}
+        {/* ATTENDANCE PAGE */}
         {activePage === 'attendance' && (
           <div className="page-container">
             <div className="page-header">
@@ -3694,7 +3743,7 @@ function StaffDashboard({ onLogout }) {
           </div>
         )}
 
-        {/* ===== STAFF PAGE - UPDATED WITH JOIN DATE ===== */}
+        {/* STAFF PAGE */}
         {activePage === 'staff' && (
           <div className="page-container">
             <div className="page-header">
@@ -3818,7 +3867,7 @@ function StaffDashboard({ onLogout }) {
           </div>
         )}
 
-        {/* ===== ADMISSIONS PAGE ===== */}
+        {/* ADMISSIONS PAGE */}
         {activePage === 'admissions' && (
           <div className="page-container">
             <div className="page-header">
@@ -3836,6 +3885,18 @@ function StaffDashboard({ onLogout }) {
                       fontSize: '14px'
                     }}>
                       {admissionStats.pending} Pending
+                    </span>
+                  )}
+                  {admissionStats.rejected > 0 && (
+                    <span className="pending-badge" style={{
+                      background: '#ef4444',
+                      color: 'white',
+                      padding: '2px 12px',
+                      borderRadius: '20px',
+                      marginLeft: '10px',
+                      fontSize: '14px'
+                    }}>
+                      {admissionStats.rejected} Rejected
                     </span>
                   )}
                 </p>
@@ -4007,6 +4068,16 @@ function StaffDashboard({ onLogout }) {
                                     </button>
                                   </>
                                 )}
+                                {admission.status === 'Rejected' && (
+                                  <button 
+                                    className="action-btn-small" 
+                                    onClick={() => deleteRejectedAdmission(admission.id || admission._id)}
+                                    title="Delete Rejected Application"
+                                    style={{ background: '#ef4444', color: 'white', borderRadius: '4px', border: 'none', padding: '4px 6px', cursor: 'pointer' }}
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                )}
                               </div>
                             </td>
                           </tr>
@@ -4019,7 +4090,7 @@ function StaffDashboard({ onLogout }) {
           </div>
         )}
 
-        {/* ===== ANNOUNCEMENTS PAGE ===== */}
+        {/* ANNOUNCEMENTS PAGE */}
         {activePage === 'announcements' && (
           <div className="page-container">
             <div className="page-header">
@@ -4298,7 +4369,7 @@ function StaffDashboard({ onLogout }) {
           </div>
         )}
 
-        {/* ===== SETTINGS PAGE ===== */}
+        {/* SETTINGS PAGE */}
         {activePage === 'settings' && (
           <div className="page-container">
             <div className="page-header">

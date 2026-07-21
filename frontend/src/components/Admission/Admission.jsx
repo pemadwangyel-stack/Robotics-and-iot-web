@@ -41,7 +41,7 @@ function Admission({ onBack }) {
     // Debug: Check if safetyConsent is being captured
     console.log('Safety Consent Value:', formData.safetyConsent);
     
-    // Check safety consent - FIXED!
+    // Check safety consent
     if (formData.safetyConsent !== true) {
       alert('Please check the Laboratory Safety Consent to proceed.');
       return;
@@ -51,7 +51,7 @@ function Admission({ onBack }) {
     setSubmitMessage('');
 
     try {
-      // Prepare data for storage
+      // Prepare data for storage - ADMISSIONS ONLY
       const admissionData = {
         id: 'admission-' + Date.now(),
         _id: 'admission-' + Date.now(),
@@ -75,7 +75,7 @@ function Admission({ onBack }) {
         guardianName: formData.guardianName,
         guardian: formData.guardianName,
         relationship: formData.relationship,
-        status: 'Pending',
+        status: 'Pending',  // Default status: Pending
         submittedAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         totalFee: 7500,
@@ -92,32 +92,10 @@ function Admission({ onBack }) {
       // Add new admission
       const updatedAdmissions = [admissionData, ...existingAdmissions];
       
-      // Save to localStorage
+      // Save to localStorage - ADMISSIONS ONLY
       localStorage.setItem('dashboard_admissions', JSON.stringify(updatedAdmissions));
 
-      // Also update students list
-      const existingStudents = JSON.parse(localStorage.getItem('dashboard_students') || '[]');
-      const studentData = {
-        _id: 'student-' + Date.now(),
-        name: formData.fullName,
-        fullName: formData.fullName,
-        class: formData.className,
-        courseTrack: formData.courseTrack,
-        school: formData.schoolName,
-        guardian: formData.guardianName,
-        guardianName: formData.guardianName,
-        phone: formData.mobileNumber,
-        mobileNumber: formData.mobileNumber,
-        email: formData.emailAddress,
-        emailAddress: formData.emailAddress,
-        status: 'Active',
-        paymentStatus: 'Pending',
-        enrollYear: new Date().getFullYear().toString(),
-        source: 'Public Admission',
-        totalFees: 7500,
-        amountPaid: 0
-      };
-      localStorage.setItem('dashboard_students', JSON.stringify([studentData, ...existingStudents]));
+      console.log('✅ Admission saved! Total:', updatedAdmissions.length);
 
       // Show success message
       setSubmitMessage('✅ Application submitted successfully! The admin will review your details.');
@@ -196,17 +174,35 @@ function Admission({ onBack }) {
               
               <div className="form-field">
                 <label>Full Name *</label>
-                <input type="text" name="fullName" required value={formData.fullName} onChange={handleInputChange} placeholder="Enter your full name" />
+                <input 
+                  type="text" 
+                  name="fullName" 
+                  required 
+                  value={formData.fullName} 
+                  onChange={handleInputChange} 
+                  placeholder="Enter your full name" 
+                />
               </div>
 
               <div className="form-field">
                 <label>Date of Birth *</label>
-                <input type="date" name="dob" required value={formData.dob} onChange={handleInputChange} />
+                <input 
+                  type="date" 
+                  name="dob" 
+                  required 
+                  value={formData.dob} 
+                  onChange={handleInputChange} 
+                />
               </div>
 
               <div className="form-field">
                 <label>Gender *</label>
-                <select name="gender" required value={formData.gender} onChange={handleInputChange}>
+                <select 
+                  name="gender" 
+                  required 
+                  value={formData.gender} 
+                  onChange={handleInputChange}
+                >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -216,7 +212,11 @@ function Admission({ onBack }) {
 
               <div className="form-field">
                 <label>Citizenship Status *</label>
-                <select name="citizenshipStatus" value={formData.citizenshipStatus} onChange={handleInputChange}>
+                <select 
+                  name="citizenshipStatus" 
+                  value={formData.citizenshipStatus} 
+                  onChange={handleInputChange}
+                >
                   <option value="Bhutanese">Bhutanese</option>
                   <option value="Foreigner">Foreigner</option>
                 </select>
@@ -224,12 +224,26 @@ function Admission({ onBack }) {
 
               <div className="form-field">
                 <label>Name of the School *</label>
-                <input type="text" name="schoolName" required value={formData.schoolName} onChange={handleInputChange} placeholder="Enter your school name" />
+                <input 
+                  type="text" 
+                  name="schoolName" 
+                  required 
+                  value={formData.schoolName} 
+                  onChange={handleInputChange} 
+                  placeholder="Enter your school name" 
+                />
               </div>
 
               <div className="form-field">
                 <label>Class *</label>
-                <input type="text" name="className" required value={formData.className} onChange={handleInputChange} placeholder="e.g., Class 10, B.Sc, etc." />
+                <input 
+                  type="text" 
+                  name="className" 
+                  required 
+                  value={formData.className} 
+                  onChange={handleInputChange} 
+                  placeholder="e.g., Class 10, B.Sc, etc." 
+                />
               </div>
 
               {/* Conditional Field */}
@@ -237,12 +251,26 @@ function Admission({ onBack }) {
                 {formData.citizenshipStatus === 'Bhutanese' ? (
                   <div className="form-field">
                     <label>CID Number (Optional)</label>
-                    <input type="text" name="cidNumber" value={formData.cidNumber} onChange={handleInputChange} placeholder="Enter 11-digit Citizenship ID Number" maxLength="11" />
+                    <input 
+                      type="text" 
+                      name="cidNumber" 
+                      value={formData.cidNumber} 
+                      onChange={handleInputChange} 
+                      placeholder="Enter 11-digit Citizenship ID Number" 
+                      maxLength="11" 
+                    />
                   </div>
                 ) : (
                   <div className="form-field">
                     <label>Passport Number / Visa Status *</label>
-                    <input type="text" name="passportNumber" required value={formData.passportNumber} onChange={handleInputChange} placeholder="Enter Passport or Work Permit ID" />
+                    <input 
+                      type="text" 
+                      name="passportNumber" 
+                      required 
+                      value={formData.passportNumber} 
+                      onChange={handleInputChange} 
+                      placeholder="Enter Passport or Work Permit ID" 
+                    />
                   </div>
                 )}
               </div>
@@ -257,10 +285,23 @@ function Admission({ onBack }) {
               
               <div className="form-field">
                 <label>Mobile Number *</label>
-                <input type="tel" name="mobileNumber" required value={formData.mobileNumber} onChange={handleInputChange} placeholder="Enter primary contact number" />
+                <input 
+                  type="tel" 
+                  name="mobileNumber" 
+                  required 
+                  value={formData.mobileNumber} 
+                  onChange={handleInputChange} 
+                  placeholder="Enter primary contact number" 
+                />
                 
                 <div className="checkbox-field">
-                  <input type="checkbox" id="isWhatsAppSame" name="isWhatsAppSame" checked={formData.isWhatsAppSame} onChange={handleInputChange} />
+                  <input 
+                    type="checkbox" 
+                    id="isWhatsAppSame" 
+                    name="isWhatsAppSame" 
+                    checked={formData.isWhatsAppSame} 
+                    onChange={handleInputChange} 
+                  />
                   <label htmlFor="isWhatsAppSame">This number is active on WhatsApp</label>
                 </div>
               </div>
@@ -268,23 +309,49 @@ function Admission({ onBack }) {
               {!formData.isWhatsAppSame && (
                 <div className="form-field">
                   <label>WhatsApp Number *</label>
-                  <input type="tel" name="whatsAppNumber" required value={formData.whatsAppNumber} onChange={handleInputChange} placeholder="Enter active WhatsApp number" />
+                  <input 
+                    type="tel" 
+                    name="whatsAppNumber" 
+                    required 
+                    value={formData.whatsAppNumber} 
+                    onChange={handleInputChange} 
+                    placeholder="Enter active WhatsApp number" 
+                  />
                 </div>
               )}
 
               <div className="form-field">
                 <label>Email Address *</label>
-                <input type="email" name="emailAddress" required value={formData.emailAddress} onChange={handleInputChange} placeholder="username@domain.com" />
+                <input 
+                  type="email" 
+                  name="emailAddress" 
+                  required 
+                  value={formData.emailAddress} 
+                  onChange={handleInputChange} 
+                  placeholder="username@domain.com" 
+                />
               </div>
 
               <div className="form-field">
                 <label>Parent / Guardian Name</label>
-                <input type="text" name="guardianName" value={formData.guardianName} onChange={handleInputChange} placeholder="Full name of guardian" />
+                <input 
+                  type="text" 
+                  name="guardianName" 
+                  value={formData.guardianName} 
+                  onChange={handleInputChange} 
+                  placeholder="Full name of guardian" 
+                />
               </div>
 
               <div className="form-field">
                 <label>Relationship to Student</label>
-                <input type="text" name="relationship" value={formData.relationship} onChange={handleInputChange} placeholder="e.g., Mother, Father, Uncle" />
+                <input 
+                  type="text" 
+                  name="relationship" 
+                  value={formData.relationship} 
+                  onChange={handleInputChange} 
+                  placeholder="e.g., Mother, Father, Uncle" 
+                />
               </div>
 
             </div>
@@ -297,7 +364,11 @@ function Admission({ onBack }) {
               
               <div className="form-field" style={{ gridColumn: '1 / -1' }}>
                 <label>Select Preferred Tech Track *</label>
-                <select name="courseTrack" value={formData.courseTrack} onChange={handleInputChange}>
+                <select 
+                  name="courseTrack" 
+                  value={formData.courseTrack} 
+                  onChange={handleInputChange}
+                >
                   <option value="Robotics and IOT">Robotics and IOT</option>
                   <option value="3-d Designing">3-d Designing</option>
                   <option value="Drone Technology">Drone Technology</option>
@@ -328,7 +399,11 @@ function Admission({ onBack }) {
               </label>
             </div>
 
-            <button type="submit" className="btn-submit-admission" disabled={isSubmitting}>
+            <button 
+              type="submit" 
+              className="btn-submit-admission" 
+              disabled={isSubmitting}
+            >
               {isSubmitting ? 'Submitting...' : 'Submit Application & Send Details'}
             </button>
           </div>
